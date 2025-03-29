@@ -3,15 +3,20 @@ import { View, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } f
 import { useInsurance } from '@/context/InsuranceContext';
 import { ThemedText } from '@/components/ThemedText';
 import { Button } from '@/components/ui/Button';
+import { IconSymbol } from '@/components/ui/IconSymbol'; // Import IconSymbol for the back button
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router'; // Import router
+import { router } from 'expo-router';
 import { Colors, Fonts } from '@/constants/theme';
-import axios from 'axios'; // Import axios for HTTP requests
+import axios from 'axios';
 
 export default function Step1() {
   const { setData } = useInsurance();
   const [photo, setPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const goBack = () => {
+    router.back(); // Navigate back to the previous screen
+  };
 
   const takePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -35,7 +40,6 @@ export default function Step1() {
     setLoading(true);
 
     try {
-      // Prepare the file for upload
       const formData = new FormData();
       formData.append('file', {
         uri: photo,
@@ -43,21 +47,15 @@ export default function Step1() {
         type: 'image/jpeg',
       });
 
-      // Make the POST request to the backend
       const response = await axios.post('http://100.68.130.224:8001/process_image_for_insurance', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      // Log the backend response
-      console.log('Backend response:', response.data);
-
-      // Extract the data from the response
       const insuranceData = response.data.insurance_data || {};
       const { modelo_tractor, condicion, color, año, descripcion_adicional } = insuranceData;
 
-      // Save the data to the context
       setData({
         photo,
         vehicleDetails: {
@@ -69,19 +67,6 @@ export default function Step1() {
         },
       });
 
-      // Log the data being saved to the context
-      console.log('Saved data:', {
-        photo,
-        vehicleDetails: {
-          model: modelo_tractor || 'Desconocido',
-          condition: condicion || 'Desconocido',
-          color: color || 'Desconocido',
-          year: año || 'Desconocido',
-          additionalDescription: descripcion_adicional || 'No disponible',
-        },
-      });
-
-      // Navigate to Step 2
       router.push('/insurance/step2');
     } catch (error) {
       console.error('Error analyzing photo:', error);
@@ -93,6 +78,11 @@ export default function Step1() {
 
   return (
     <View style={styles.container}>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={goBack}>
+        <IconSymbol name="chevron.left" size={24} color={Colors.primary} />
+      </TouchableOpacity>
+
       <ThemedText style={styles.title}>Toma una foto de tu vehículo</ThemedText>
       <ThemedText style={styles.subtitle}>
         Esto nos ayudará a identificar tu vehículo y ofrecerte un plan de seguro personalizado.
@@ -131,6 +121,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  backButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 10,
+  },
   title: {
     ...Fonts.title,
     marginBottom: 8,
@@ -158,14 +154,14 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   photo: {
-    width: 300, // Larger photo
+    width: 300,
     height: 300,
     borderRadius: 12,
     borderWidth: 2,
     borderColor: Colors.primary,
   },
   photoPlaceholder: {
-    width: 300, // Larger placeholder
+    width: 300,
     height: 300,
     borderRadius: 12,
     backgroundColor: Colors.border,

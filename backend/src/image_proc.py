@@ -120,11 +120,12 @@ def process_image_for_insurance_creation(image_path: str) -> dict:
         input_text = """
         Analiza la imagen proporcionada para extraer datos relevantes para la creación de un seguro.
         Proporciona los siguientes detalles en formato JSON:
-        - `modelo_tractor` (string): El modelo identificado del tractor.
+        - `modelo_tractor` (string): La marca y el modelo identificado del tractor.
         - `condicion` (string): Una descripción del estado físico del tractor.
         - `color` (string): El color del tractor.
         - `año` (integer): El año de fabricación del tractor.
         - `descripcion_adicional` (string): Cualquier información adicional relevante observada en la imagen.
+        - `hay_tractor` (boolean): Indica si el tractor está presente en la imagen.
         """
         try:
             contents = [

@@ -1,37 +1,57 @@
 import React from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { useInsurance } from '@/context/InsuranceContext';
-import { InsuranceOffer } from '@/components/InsuranceOffer';
+import { ThemedText } from '@/components/ThemedText';
 import { Button } from '@/components/ui/Button';
-import { router } from 'expo-router'; // Import router
 import { Colors, Fonts } from '@/constants/theme';
+import { router } from 'expo-router';
 
 export default function OfferScreen() {
   const { data, resetData } = useInsurance();
 
   const handlePurchase = () => {
-    Alert.alert('Success', 'Your insurance plan has been purchased!');
+    Alert.alert('¡Éxito!', '¡Tu plan de seguro ha sido adquirido!');
     resetData();
     router.push('/'); // Redirect to home
   };
 
+  const handleStartOver = () => {
+    resetData();
+    router.push('/insurance/step1'); // Restart the flow
+  };
+
   return (
     <View style={styles.container}>
-      <InsuranceOffer
-        offer={{
-          vehicleType: data.vehicleDetails?.model || 'Unknown',
-          riskLevel: 'Low',
-          monthlyPrice: 49.99,
-          coverage: 'Full coverage for accidents, theft, and natural disasters.',
-          recommendation: 'This plan is ideal for your usage and location.',
-          plan: 'Premium',
-        }}
-        onStartOver={() => {
-          resetData();
-          router.push('/insurance/step1'); // Use router.push
-        }}
+      <View style={styles.offerCard}>
+        <ThemedText style={styles.planTitle}>{data.vehicleDetails?.model || 'Modelo desconocido'}</ThemedText>
+        <ThemedText style={styles.planSubtitle}>Plan: Premium</ThemedText>
+        <ThemedText style={styles.price}>$49.99/mes</ThemedText>
+
+        <View style={styles.divider} />
+
+        <ThemedText style={styles.detailsTitle}>Cobertura:</ThemedText>
+        <ThemedText style={styles.detailsText}>
+          Cobertura completa para accidentes, robo y desastres naturales.
+        </ThemedText>
+
+        <ThemedText style={styles.detailsTitle}>Recomendación:</ThemedText>
+        <ThemedText style={styles.detailsText}>
+          Este plan es ideal para tu uso y ubicación.
+        </ThemedText>
+      </View>
+
+      <Button
+        title="Adquirir Plan"
+        onPress={handlePurchase}
+        type="primary"
+        style={styles.purchaseButton}
       />
-      <Button title="Purchase Plan" onPress={handlePurchase} />
+      <Button
+        title="Volver a empezar"
+        onPress={handleStartOver}
+        type="secondary"
+        style={styles.startOverButton}
+      />
     </View>
   );
 }
@@ -41,33 +61,59 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: Colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   offerCard: {
-    padding: 16,
+    width: '100%',
     backgroundColor: Colors.white,
     borderRadius: 12,
+    padding: 16,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+    marginBottom: 24,
+  },
+  planTitle: {
+    ...Fonts.title,
+    textAlign: 'center',
+    marginBottom: 8,
+    color: Colors.primary,
+  },
+  planSubtitle: {
+    ...Fonts.body,
+    textAlign: 'center',
+    marginBottom: 16,
+    color: Colors.textSecondary,
+  },
+  price: {
+    ...Fonts.title,
+    textAlign: 'center',
+    color: Colors.success, // Green for price
     marginBottom: 16,
   },
-  offerTitle: {
-    ...Fonts.title,
-    marginBottom: 8,
+  divider: {
+    height: 1,
+    backgroundColor: Colors.border,
+    marginVertical: 16,
   },
-  offerDetails: {
+  detailsTitle: {
     ...Fonts.body,
-    marginBottom: 8,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: Colors.textPrimary,
   },
-  button: {
-    marginTop: 16,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
+  detailsText: {
+    ...Fonts.body,
+    marginBottom: 16,
+    color: Colors.textSecondary,
   },
-  buttonText: {
-    ...Fonts.button,
+  purchaseButton: {
+    width: '100%',
+    marginBottom: 16,
+  },
+  startOverButton: {
+    width: '100%',
   },
 });

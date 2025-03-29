@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import * as Location from 'expo-location';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -35,17 +44,16 @@ export function LocationSelector({ value, onChange }: LocationSelectorProps) {
   const getCurrentLocation = async () => {
     if (!hasLocationPermission) {
       Alert.alert(
-        'Permission Required',
-        'Please allow location access to use this feature.',
+        'Permiso requerido',
+        'Por favor, permite el acceso a la ubicación para usar esta función.',
         [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Settings',
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Configuración',
             onPress: () => {
-              // Ideally open settings, but for now just request again
               Location.requestForegroundPermissionsAsync();
-            }
-          }
+            },
+          },
         ]
       );
       return;
@@ -54,34 +62,36 @@ export function LocationSelector({ value, onChange }: LocationSelectorProps) {
     setIsLoading(true);
     try {
       const currentLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Highest
+        accuracy: Location.Accuracy.Highest,
       });
-      
+
       // Get address from coordinates
       const [addressResult] = await Location.reverseGeocodeAsync({
         latitude: currentLocation.coords.latitude,
-        longitude: currentLocation.coords.longitude
+        longitude: currentLocation.coords.longitude,
       });
-      
+
       const formattedAddress = [
         addressResult.street,
         addressResult.city,
         addressResult.region,
         addressResult.postalCode,
-        addressResult.country
-      ].filter(Boolean).join(', ');
-      
+        addressResult.country,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
       setAddress(formattedAddress);
-      
+
       onChange({
         latitude: currentLocation.coords.latitude,
         longitude: currentLocation.coords.longitude,
-        address: formattedAddress
+        address: formattedAddress,
       });
     } catch (error) {
       Alert.alert(
-        'Location Error',
-        'Unable to get your current location. Please try again or enter the location manually.'
+        'Error de ubicación',
+        'No se pudo obtener tu ubicación actual. Por favor, inténtalo de nuevo o ingresa la ubicación manualmente.'
       );
     } finally {
       setIsLoading(false);
@@ -92,57 +102,56 @@ export function LocationSelector({ value, onChange }: LocationSelectorProps) {
     setAddress(text);
     onChange({
       ...value,
-      address: text
+      address: text,
     });
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Where did it happen?</ThemedText>
-      
-      <ThemedView style={styles.addressContainer}>
-        <TextInput
-          style={styles.addressInput}
-          placeholder="Enter the address or location"
-          value={address}
-          onChangeText={handleAddressChange}
-          multiline
-          numberOfLines={3}
-        />
-      </ThemedView>
-      
-      <TouchableOpacity 
-        style={styles.locationButton}
-        onPress={getCurrentLocation}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <ActivityIndicator size="small" color="#FFFFFF" />
-        ) : (
-          <>
-            <IconSymbol name="location.fill" size={18} color="#FFFFFF" />
-            <ThemedText style={styles.locationButtonText}>
-              Use Current Location
-            </ThemedText>
-          </>
-        )}
-      </TouchableOpacity>
-      
-      {value.latitude && value.longitude && (
-        <ThemedView style={styles.coordinatesContainer}>
-          <ThemedText style={styles.coordinatesText}>
-            Latitude: {value.latitude.toFixed(6)}
-          </ThemedText>
-          <ThemedText style={styles.coordinatesText}>
-            Longitude: {value.longitude.toFixed(6)}
-          </ThemedText>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ThemedView style={styles.container}>
+        <ThemedView style={styles.addressContainer}>
+          <TextInput
+            style={styles.addressInput}
+            placeholder="Ingresa la dirección o ubicación"
+            value={address}
+            onChangeText={handleAddressChange}
+            multiline
+            numberOfLines={3}
+            placeholderTextColor={Colors.textSecondary}
+          />
         </ThemedView>
-      )}
-      
-      <ThemedText style={styles.note}>
-        Note: Providing accurate location information helps us process your claim more efficiently.
-      </ThemedText>
-    </ThemedView>
+
+        <TouchableOpacity
+          style={styles.locationButton}
+          onPress={getCurrentLocation}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator size="small" color={Colors.white} />
+          ) : (
+            <>
+              <IconSymbol name="location.fill" size={18} color={Colors.white} />
+              <ThemedText style={styles.locationButtonText}>Usar ubicación actual</ThemedText>
+            </>
+          )}
+        </TouchableOpacity>
+
+        {value.latitude && value.longitude && (
+          <ThemedView style={styles.coordinatesContainer}>
+            <ThemedText style={styles.coordinatesText}>
+              Latitud: {value.latitude.toFixed(6)}
+            </ThemedText>
+            <ThemedText style={styles.coordinatesText}>
+              Longitud: {value.longitude.toFixed(6)}
+            </ThemedText>
+          </ThemedView>
+        )}
+
+        <ThemedText style={styles.note}>
+          Nota: Proporcionar información precisa de la ubicación nos ayuda a procesar tu reclamo de manera más eficiente.
+        </ThemedText>
+      </ThemedView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -151,29 +160,36 @@ const styles = StyleSheet.create({
     gap: 16,
     padding: 16,
     backgroundColor: Colors.background,
-    borderRadius: 8,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   title: {
     ...Fonts.title,
     marginBottom: 8,
+    textAlign: 'center',
   },
   addressContainer: {
     borderWidth: 1,
     borderColor: Colors.border,
-    borderRadius: 8,
-    padding: 8,
+    borderRadius: 12,
+    padding: 12,
+    backgroundColor: Colors.white,
   },
   addressInput: {
     fontSize: 16,
     minHeight: 80,
     textAlignVertical: 'top',
+    color: Colors.textPrimary,
   },
   locationButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.primary,
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
     gap: 8,
   },
@@ -183,7 +199,7 @@ const styles = StyleSheet.create({
   },
   coordinatesContainer: {
     backgroundColor: 'rgba(31, 68, 140, 0.05)',
-    borderRadius: 8,
+    borderRadius: 12,
     padding: 12,
   },
   coordinatesText: {
@@ -194,5 +210,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: 'italic',
     color: Colors.textSecondary,
+    textAlign: 'center',
   },
 });

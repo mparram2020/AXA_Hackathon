@@ -8,33 +8,33 @@ import { IconSymbol } from '@/components/ui/IconSymbol';
 export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText style={styles.title}>Welcome to AXA Agro</ThemedText>
+      <ThemedText style={styles.title}>Bienvenido a AXA Agro</ThemedText>
       <ThemedText style={styles.subtitle}>
-        What would you like to do today?
+        ¿Qué te gustaría hacer hoy?
       </ThemedText>
 
       <View style={styles.optionsContainer}>
-        {/* File a Claim Option */}
+        {/* Opción para Hacer Reporte de Accidente */}
         <TouchableOpacity
           style={styles.optionCard}
-          onPress={() => router.push('/claims/selection')}
+          onPress={() => router.push('/claims/photo')} // Navigate to the photo capture screen
         >
           <IconSymbol name="doc.text.fill" size={40} color="#1F448C" />
-          <ThemedText style={styles.optionTitle}>File a Claim</ThemedText>
+          <ThemedText style={styles.optionTitle}>Hacer reporte de accidente</ThemedText>
           <ThemedText style={styles.optionDescription}>
-            Report an incident and file a claim for your agricultural equipment or vehicle.
+            Reporta un incidente y presenta un reclamo para tu equipo o vehículo agrícola.
           </ThemedText>
         </TouchableOpacity>
 
-        {/* Create Insurance Option */}
+        {/* Opción para Adaptar el Seguro */}
         <TouchableOpacity
           style={styles.optionCard}
-          onPress={() => router.push('/insurance/step1')} // Correct route
+          onPress={() => router.push('/insurance/step1')} // Navigate to the insurance flow
         >
           <IconSymbol name="shield.checkerboard" size={40} color="#4CAF50" />
-          <ThemedText style={styles.optionTitle}>Create Insurance</ThemedText>
+          <ThemedText style={styles.optionTitle}>Adaptar el Seguro</ThemedText>
           <ThemedText style={styles.optionDescription}>
-            Get a personalized insurance quote for your agricultural equipment or vehicle.
+            Obtén una cotización personalizada para tu equipo o vehículo agrícola.
           </ThemedText>
         </TouchableOpacity>
       </View>
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 8,
-    color: '#103184', // AXA blue
+    color: '#103184', // Azul AXA
   },
   subtitle: {
     fontSize: 16,

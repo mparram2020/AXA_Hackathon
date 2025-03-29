@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Image, TextInput, Alert } from 'react-native';
 import { useInsurance } from '@/context/InsuranceContext';
 import { ThemedText } from '@/components/ThemedText';
 import { Button } from '@/components/ui/Button';
@@ -7,47 +7,109 @@ import { router } from 'expo-router';
 import { Colors, Fonts } from '@/constants/theme';
 
 export default function Step2() {
-  const { data } = useInsurance();
+  const { data, setData } = useInsurance();
 
-  // Log the data from the context
-  console.log('Context data:', data);
+  // Local state for editable fields
+  const [model, setModel] = useState(data.vehicleDetails?.model || '');
+  const [condition, setCondition] = useState(data.vehicleDetails?.condition || '');
+  const [color, setColor] = useState(data.vehicleDetails?.color || '');
+  const [year, setYear] = useState(data.vehicleDetails?.year || '');
+  const [additionalDescription, setAdditionalDescription] = useState(
+    data.vehicleDetails?.additionalDescription || ''
+  );
 
-  // Ensure vehicleDetails exists
-  const vehicleDetails = data?.vehicleDetails || {};
+  const saveChanges = () => {
+    if (!model || !condition || !color || !year || !additionalDescription) {
+      Alert.alert('Error', 'Todos los campos deben estar completos.');
+      return;
+    }
+
+    // Update the context with the edited details
+    setData({
+      ...data,
+      vehicleDetails: {
+        model,
+        condition,
+        color,
+        year,
+        additionalDescription,
+      },
+    });
+
+    Alert.alert('Éxito', 'Los detalles del vehículo han sido actualizados.');
+  };
 
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.title}>Confirma los detalles del vehículo</ThemedText>
+      <ThemedText style={styles.title}>Confirma o edita los detalles del vehículo</ThemedText>
       <ThemedText style={styles.subtitle}>
-        Verifica que los detalles sean correctos o toma otra foto si es necesario.
+        Verifica que los detalles sean correctos o edítalos si es necesario.
       </ThemedText>
 
       <View style={styles.card}>
         <Image source={{ uri: data.photo }} style={styles.photo} />
         <View style={styles.detailsContainer}>
-          <ThemedText style={styles.detailsText}>
-            <ThemedText style={styles.label}>Modelo: </ThemedText>
-            {vehicleDetails.model || 'Desconocido'}
-          </ThemedText>
-          <ThemedText style={styles.detailsText}>
-            <ThemedText style={styles.label}>Condición: </ThemedText>
-            {vehicleDetails.condition || 'Desconocido'}
-          </ThemedText>
-          <ThemedText style={styles.detailsText}>
-            <ThemedText style={styles.label}>Color: </ThemedText>
-            {vehicleDetails.color || 'Desconocido'}
-          </ThemedText>
-          <ThemedText style={styles.detailsText}>
-            <ThemedText style={styles.label}>Año: </ThemedText>
-            {vehicleDetails.year || 'Desconocido'}
-          </ThemedText>
-          <ThemedText style={styles.detailsText}>
-            <ThemedText style={styles.label}>Descripción adicional: </ThemedText>
-            {vehicleDetails.additionalDescription || 'No disponible'}
-          </ThemedText>
+          <View style={styles.inputGroup}>
+            <ThemedText style={styles.label}>Modelo:</ThemedText>
+            <TextInput
+              style={styles.input}
+              value={model}
+              onChangeText={setModel}
+              placeholder="Ingresa el modelo"
+              placeholderTextColor={Colors.textSecondary}
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <ThemedText style={styles.label}>Condición:</ThemedText>
+            <TextInput
+              style={styles.input}
+              value={condition}
+              onChangeText={setCondition}
+              placeholder="Ingresa la condición"
+              placeholderTextColor={Colors.textSecondary}
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <ThemedText style={styles.label}>Color:</ThemedText>
+            <TextInput
+              style={styles.input}
+              value={color}
+              onChangeText={setColor}
+              placeholder="Ingresa el color"
+              placeholderTextColor={Colors.textSecondary}
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <ThemedText style={styles.label}>Año:</ThemedText>
+            <TextInput
+              style={styles.input}
+              value={year}
+              onChangeText={setYear}
+              placeholder="Ingresa el año"
+              placeholderTextColor={Colors.textSecondary}
+              keyboardType="numeric"
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <ThemedText style={styles.label}>Descripción adicional:</ThemedText>
+            <TextInput
+              style={styles.input}
+              value={additionalDescription}
+              onChangeText={setAdditionalDescription}
+              placeholder="Ingresa una descripción adicional"
+              placeholderTextColor={Colors.textSecondary}
+              multiline
+            />
+          </View>
         </View>
       </View>
 
+      <Button
+        title="Guardar Cambios"
+        onPress={saveChanges}
+        type="primary"
+        style={styles.button}
+      />
       <Button
         title="Confirmar"
         onPress={() => router.push('/insurance/step3')}
@@ -108,16 +170,24 @@ const styles = StyleSheet.create({
   },
   detailsContainer: {
     width: '100%',
-    alignItems: 'flex-start',
   },
-  detailsText: {
-    ...Fonts.body,
-    marginBottom: 8,
-    color: Colors.textPrimary,
+  inputGroup: {
+    marginBottom: 16,
   },
   label: {
+    ...Fonts.body,
     fontWeight: 'bold',
-    color: Colors.textSecondary,
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: Colors.textPrimary,
+    backgroundColor: Colors.background,
   },
   button: {
     width: '100%',

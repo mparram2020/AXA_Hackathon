@@ -28,7 +28,7 @@ export function ClaimStep({
   // Add these handlers to prevent event bubbling
   const handleNext = (e: any) => {
     // Prevent any default behavior that might affect scrolling
-    console.log('Next button clicked');
+    //console.log('Next button clicked');
     if (e && e.preventDefault) e.preventDefault();
     onNext();
   };
