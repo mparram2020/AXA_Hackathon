@@ -1,162 +1,93 @@
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { useState } from 'react';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import React from 'react';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { InsuranceQuoteForm } from '@/components/InsuranceQuoteForm';
-import { InsuranceOffer } from '@/components/InsuranceOffer';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 
 export default function HomeScreen() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [insuranceOffer, setInsuranceOffer] = useState(null);
-  const [loading, setLoading] = useState(false);
-  
-  // Process the completed form data
-  const handleComplete = async (formData) => {
-    setLoading(true);
-    
-    // Simulate API call to Gemini for risk assessment
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Generate a tailored offer based on the data
-    const offer = generateInsuranceOffer(formData);
-    setInsuranceOffer(offer);
-    setLoading(false);
-    setCurrentStep(1); // Move to results step
-  };
-  
-  // Reset and start over
-  const handleStartOver = () => {
-    setCurrentStep(0);
-    setInsuranceOffer(null);
-  };
-
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#103184', dark: '#00008f' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/axa-logo.png')}
-          style={styles.headerLogo}
-        />
-      }>
-      <ThemedView style={styles.container}>
-        <ThemedText type="title" style={styles.mainTitle}>AXA Agro Truck Insurance</ThemedText>
-        
-        {currentStep === 0 && (
-          <Animated.View 
-            entering={FadeIn} 
-            exiting={FadeOut}
-            style={styles.contentContainer}
-          >
-            <ThemedText style={styles.subtitle}>
-              Tell us about your agricultural vehicle to get a personalized quote
-            </ThemedText>
-            
-            <InsuranceQuoteForm 
-              onComplete={handleComplete}
-              isLoading={loading}
-            />
-          </Animated.View>
-        )}
-        
-        {currentStep === 1 && insuranceOffer && (
-          <Animated.View 
-            entering={FadeIn} 
-            exiting={FadeOut}
-            style={styles.contentContainer}
-          >
-            <InsuranceOffer 
-              offer={insuranceOffer}
-              onStartOver={handleStartOver}
-            />
-          </Animated.View>
-        )}
-      </ThemedView>
-    </ParallaxScrollView>
-  );
-}
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.title}>Welcome to AXA Agro</ThemedText>
+      <ThemedText style={styles.subtitle}>
+        What would you like to do today?
+      </ThemedText>
 
-// Helper function to generate an insurance offer based on form data
-function generateInsuranceOffer(formData) {
-  const { vehicleType, vehicleAge, vehicleValue, usage } = formData;
-  
-  // Calculate risk score (simplified)
-  let riskScore = 0;
-  
-  // Age factor
-  if (vehicleAge <= 3) riskScore += 1;
-  else if (vehicleAge <= 8) riskScore += 2;
-  else riskScore += 3;
-  
-  // Value factor
-  const value = parseInt(vehicleValue, 10);
-  if (value <= 30000) riskScore += 1;
-  else if (value <= 70000) riskScore += 2;
-  else riskScore += 3;
-  
-  // Usage factor
-  if (usage === 'occasional') riskScore += 1;
-  else if (usage === 'seasonal') riskScore += 2;
-  else riskScore += 3;
-  
-  // Determine plan and pricing
-  let plan, coverage, monthlyPrice;
-  
-  if (riskScore <= 4) {
-    plan = 'Standard';
-    coverage = 'Basic liability and collision coverage';
-    monthlyPrice = value * 0.0008 + 89;
-  } else if (riskScore <= 7) {
-    plan = 'Premium';
-    coverage = 'Comprehensive coverage with theft protection';
-    monthlyPrice = value * 0.001 + 129;
-  } else {
-    plan = 'Premium Plus';
-    coverage = 'Full comprehensive coverage including severe weather damage';
-    monthlyPrice = value * 0.0013 + 169;
-  }
-  
-  return {
-    plan,
-    coverage,
-    monthlyPrice,
-    riskScore,
-    riskLevel: riskScore <= 4 ? 'Low Risk' : riskScore <= 7 ? 'Medium Risk' : 'High Risk',
-    vehicleType,
-    recommendation: riskScore <= 4 
-      ? 'Your agricultural vehicle qualifies for our standard coverage at a competitive rate.'
-      : riskScore <= 7 
-        ? 'Based on your vehicle profile, we recommend our Premium plan for better protection.'
-        : 'For maximum protection of your high-value equipment, we strongly recommend our Premium Plus plan.'
-  };
+      <View style={styles.optionsContainer}>
+        {/* File a Claim Option */}
+        <TouchableOpacity
+          style={styles.optionCard}
+          onPress={() => router.push('/claims/selection')}
+        >
+          <IconSymbol name="doc.text.fill" size={40} color="#1F448C" />
+          <ThemedText style={styles.optionTitle}>File a Claim</ThemedText>
+          <ThemedText style={styles.optionDescription}>
+            Report an incident and file a claim for your agricultural equipment or vehicle.
+          </ThemedText>
+        </TouchableOpacity>
+
+        {/* Create Insurance Option */}
+        <TouchableOpacity
+          style={styles.optionCard}
+          onPress={() => router.push('/insurance/step1')} // Correct route
+        >
+          <IconSymbol name="shield.checkerboard" size={40} color="#4CAF50" />
+          <ThemedText style={styles.optionTitle}>Create Insurance</ThemedText>
+          <ThemedText style={styles.optionDescription}>
+            Get a personalized insurance quote for your agricultural equipment or vehicle.
+          </ThemedText>
+        </TouchableOpacity>
+      </View>
+    </ThemedView>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     padding: 16,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
   },
-  headerLogo: {
-    height: 60,
-    width: 100,
-    bottom: 10,
-    right: 10,
-    position: 'absolute',
-    resizeMode: 'contain'
-  },
-  mainTitle: {
-    color: '#FF1721', // AXA red
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 8,
+    color: '#103184', // AXA blue
   },
   subtitle: {
-    textAlign: 'center',
-    marginBottom: 24,
     fontSize: 16,
+    textAlign: 'center',
+    color: '#666666',
+    marginBottom: 24,
   },
-  contentContainer: {
-    width: '100%',
-  }
+  optionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 16,
+  },
+  optionCard: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+  },
+  optionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1F448C',
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  optionDescription: {
+    fontSize: 14,
+    color: '#666666',
+    textAlign: 'center',
+  },
 });

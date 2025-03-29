@@ -1,48 +1,43 @@
 import { useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-import * as Location from 'expo-location'; // Asegúrate de tener expo-location instalado
+import { StyleSheet, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { LocationSelector } from './claims/LocationSelector';
 
-export function InsuranceLocation({ onComplete, isLoading }) {
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null); // Explicitly define the type
-
-  const handleShareLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      const currentLocation = await Location.getCurrentPositionAsync({});
-      setLocation(currentLocation);
-    } catch (error) {
-      setErrorMsg('Error fetching location');
-    }
-  };
+export function InsuranceLocation({ onComplete }) {
+  const [location, setLocation] = useState({
+    latitude: undefined,
+    longitude: undefined,
+    address: '',
+  });
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    if (location) {
-      onComplete(location); // Envía la ubicación al componente padre o realiza alguna acción
+    if (location.latitude && location.longitude) {
+      onComplete(location); // Pass the location to the parent component
     } else {
-      setErrorMsg('Please share your location before continuing');
+      setErrorMsg('Please provide a location before continuing.');
     }
   };
 
   return (
     <ThemedView style={styles.container}>
+      <ThemedText style={styles.label}>Provide the location of the incident:</ThemedText>
+      
+      {/* Use the LocationSelector component */}
       <LocationSelector 
-      value={
-        latitude: 0;
-        longitude: 0;
-        address: 0;
-      }
-      onChange={
-        setLocation()
-      }
+        value={location}
+        onChange={(newLocation) => {
+          setLocation(newLocation);
+          setErrorMsg(null); // Clear any previous error messages
+        }}
+      />
+
+      {errorMsg && <ThemedText style={styles.errorText}>{errorMsg}</ThemedText>}
+
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <ThemedText style={styles.submitButtonText}>Submit Location</ThemedText>
+      </TouchableOpacity>
     </ThemedView>
   );
 }
@@ -56,22 +51,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     fontWeight: '500',
     fontSize: 16,
-  },
-  locationButton: {
-    backgroundColor: '#103184', // AXA blue
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  locationButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  successText: {
-    color: '#28A745',
-    fontSize: 14,
-    marginTop: 8,
   },
   errorText: {
     color: '#FF1721',

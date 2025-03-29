@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { Colors, Fonts } from '@/constants/theme';
 
 interface LocationSelectorProps {
   value: {
@@ -148,20 +149,22 @@ export function LocationSelector({ value, onChange }: LocationSelectorProps) {
 const styles = StyleSheet.create({
   container: {
     gap: 16,
+    padding: 16,
+    backgroundColor: Colors.background,
+    borderRadius: 8,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    ...Fonts.title,
+    marginBottom: 8,
   },
   addressContainer: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: Colors.border,
     borderRadius: 8,
     padding: 8,
   },
   addressInput: {
     fontSize: 16,
-    padding: 4,
     minHeight: 80,
     textAlignVertical: 'top',
   },
@@ -169,13 +172,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#1F448C',
+    backgroundColor: Colors.primary,
     borderRadius: 8,
     padding: 12,
     gap: 8,
   },
   locationButtonText: {
-    color: '#FFFFFF',
+    color: Colors.white,
     fontWeight: '600',
   },
   coordinatesContainer: {
@@ -185,11 +188,11 @@ const styles = StyleSheet.create({
   },
   coordinatesText: {
     fontSize: 14,
-    color: '#555555',
+    color: Colors.textSecondary,
   },
   note: {
     fontSize: 14,
     fontStyle: 'italic',
-    color: '#666666',
+    color: Colors.textSecondary,
   },
 });

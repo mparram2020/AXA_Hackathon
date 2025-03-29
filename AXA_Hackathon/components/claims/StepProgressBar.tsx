@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, Dimensions } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
+import { Colors } from '@/constants/theme';
+
 
 interface StepProgressBarProps {
   steps: number;
@@ -71,6 +73,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    backgroundColor: Colors.background,
   },
   progressLineContainer: {
     position: 'absolute',
@@ -78,12 +81,12 @@ const styles = StyleSheet.create({
     left: 24,
     right: 24,
     height: 2,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: Colors.border,
     zIndex: 1,
   },
   progressLine: {
     height: 2,
-    backgroundColor: '#1F448C',
+    backgroundColor: Colors.primary,
   },
   stepsContainer: {
     flexDirection: 'row',
@@ -97,27 +100,27 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.white,
     borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderColor: Colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
   currentStep: {
-    backgroundColor: '#1F448C',
-    borderColor: '#1F448C',
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   completedStep: {
-    backgroundColor: '#1F448C',
-    borderColor: '#1F448C',
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   stepText: {
     fontSize: 10,
     fontWeight: 'bold',
-    color: '#757575',
+    color: Colors.textSecondary,
   },
   activeStepText: {
-    color: '#FFFFFF',
+    color: Colors.white,
   },
   checkmark: {
     width: 10,
