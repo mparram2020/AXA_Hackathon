@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { StyleSheet, ScrollView, View, KeyboardAvoidingView, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useClaimStore } from '@/stores/claimStore';
-import { ClaimStep } from '@/components/claims/ClaimStep';
 import { EventTypeSelector } from '@/components/claims/EventTypeSelector';
 import { DateTimeSelector } from '@/components/claims/DateTimeSelector';
 import { LocationSelector } from '@/components/claims/LocationSelector';
@@ -21,6 +20,7 @@ import { ClaimReviewSubmit } from '@/components/claims/ClaimReviewSubmit';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StepProgressBar } from '@/components/claims/StepProgressBar';
 import { IconButton } from '@/components/ui/IconButton';
+import { Button } from '@/components/ui/Button';
 
 // Define the steps in the claim filing process
 const steps = [
@@ -40,6 +40,7 @@ const steps = [
 export default function NewClaimScreen() {
   const [currentStep, setCurrentStep] = useState(0);
   const { initDraftClaim, draftClaim, updateDraftClaim } = useClaimStore();
+  const scrollViewRef = useRef<ScrollView>(null);
   
   useEffect(() => {
     // Initialize a new draft claim when the screen loads
@@ -47,6 +48,11 @@ export default function NewClaimScreen() {
       initDraftClaim();
     }
   }, [initDraftClaim, draftClaim]);
+
+  // Scroll to top when changing steps
+  useEffect(() => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  }, [currentStep]);
 
   if (!draftClaim) return null;
 
@@ -139,8 +145,18 @@ export default function NewClaimScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={['top']} >
       <StatusBar style="dark" />
+      
+      <View style={styles.header}>
+        <IconButton 
+          name="chevron.left" 
+          size={24} 
+          onPress={() => router.back()} 
+          style={styles.backButton} 
+        />
+        <ThemedText style={styles.headerTitle}>File a Claim</ThemedText>
+      </View>
       
       <StepProgressBar 
         steps={steps.length} 
@@ -153,32 +169,59 @@ export default function NewClaimScreen() {
         }}
       />
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        <ClaimStep 
-          title={steps[currentStep].title}
-          currentStep={currentStep + 1}
-          totalSteps={steps.length}
-          onNext={handleNext} 
-          onPrevious={handlePrevious}
-          canProgress={isStepComplete()}
-          isLastStep={currentStep === steps.length - 1}
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.keyboardView}
+      >
+        <ScrollView 
+          ref={scrollViewRef}
+          style={styles.scrollView} 
+          contentContainerStyle={styles.scrollContent}
         >
-          {renderStep()}
-        </ClaimStep>
-        
-        {/* 7-day deadline and damage mitigation reminder */}
-        {currentStep === 0 && (
-          <ThemedView style={styles.reminderContainer}>
-            <ThemedText style={styles.reminderTitle}>Important Reminders:</ThemedText>
-            <ThemedText style={styles.reminderText}>
-              • You must report incidents within 7 days of occurrence
+          <ThemedView style={styles.stepContainer}>
+            <ThemedText style={styles.stepTitle}>
+              {steps[currentStep].title}
             </ThemedText>
-            <ThemedText style={styles.reminderText}>
-              • You are obligated to use all means at your disposal to minimize damages
-            </ThemedText>
+            
+            <ThemedView style={styles.stepContent}>
+              {renderStep()}
+            </ThemedView>
           </ThemedView>
-        )}
-      </ScrollView>
+          
+          {/* 7-day deadline and damage mitigation reminder */}
+          {currentStep === 0 && (
+            <ThemedView style={styles.reminderContainer}>
+              <ThemedText style={styles.reminderTitle}>Important Reminders:</ThemedText>
+              <ThemedText style={styles.reminderText}>
+                • You must report incidents within 7 days of occurrence
+              </ThemedText>
+              <ThemedText style={styles.reminderText}>
+                • You are obligated to use all means at your disposal to minimize damages
+              </ThemedText>
+            </ThemedView>
+          )}
+          
+          {/* Add padding at bottom to prevent content from being hidden behind buttons */}
+          <View style={styles.bottomPadding} />
+        </ScrollView>
+        
+        {/* Fixed navigation buttons */}
+        <View style={styles.navigationBar}>
+          <Button 
+            title="Back" 
+            onPress={handlePrevious} 
+            style={styles.navButton} 
+            type="secondary" 
+          />
+          <Button 
+            title={currentStep === steps.length - 1 ? "Submit Claim" : "Next"} 
+            onPress={handleNext} 
+            style={styles.navButton} 
+            disabled={!isStepComplete()}
+            type="primary" 
+          />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -194,8 +237,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   backButton: {
     marginRight: 16,
+  },
+  keyboardView: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,
@@ -203,8 +253,25 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
   },
+  stepContainer: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  stepTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    padding: 16,
+    backgroundColor: 'rgba(31, 68, 140, 0.05)',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  stepContent: {
+    padding: 16,
+  },
   reminderContainer: {
-    marginTop: 24,
     padding: 16,
     backgroundColor: 'rgba(255, 236, 179, 0.3)',
     borderRadius: 8,
@@ -218,5 +285,20 @@ const styles = StyleSheet.create({
   reminderText: {
     fontSize: 14,
     marginBottom: 4,
+  },
+  bottomPadding: {
+    height: 80, // Space for the fixed navigation bar
+  },
+  navigationBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
+  },
+  navButton: {
+    flex: 1,
+    marginHorizontal: 8,
   },
 });

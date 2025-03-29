@@ -4,41 +4,32 @@ import { Picker } from '@react-native-picker/picker';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { InsuranceConditions } from './InsuranceConditions'; // Importa el componente
 
 const VEHICLE_TYPES = [
-  { label: 'Select type...', value: '' },
-  { label: 'Tractor', value: 'tractor' },
-  { label: 'Harvester', value: 'harvester' },
+  { label: 'Selecciona el tipo...', value: '' },
+  { label: 'Tractor agrícola estándar', value: 'estandar' },
+  { label: 'Tractor viñero o frutero', value: 'frutero' },
   { label: 'Sprayer', value: 'sprayer' },
-  { label: 'Loader', value: 'loader' },
-  { label: 'Transport Truck', value: 'truck' },
   { label: 'Other', value: 'other' },
 ];
 
-const USAGE_TYPES = [
-  { label: 'Select usage...', value: '' },
-  { label: 'Daily (Heavy Use)', value: 'daily' },
-  { label: 'Seasonal', value: 'seasonal' },
-  { label: 'Occasional', value: 'occasional' },
-];
-
-export function InsuranceQuoteForm({ onComplete, isLoading }) {
+export function InsuranceQuoteForm({ isLoading }) {
   const [formData, setFormData] = useState({
     vehicleType: '',
     vehicleAge: '',
-    vehicleValue: '',
-    usage: '',
+    vehicleModel: '',
   });
 
   const [errors, setErrors] = useState({});
+  const [showConditions, setShowConditions] = useState(false); // Estado para manejar la navegación
 
   const handleChange = (field, value) => {
     setFormData({
       ...formData,
       [field]: value,
     });
-    
-    // Clear error when field is updated
+
     if (errors[field]) {
       setErrors({
         ...errors,
@@ -49,42 +40,45 @@ export function InsuranceQuoteForm({ onComplete, isLoading }) {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.vehicleType) newErrors.vehicleType = 'Please select a vehicle type';
     if (!formData.vehicleAge) newErrors.vehicleAge = 'Please enter vehicle age';
-    if (!formData.vehicleValue) newErrors.vehicleValue = 'Please enter vehicle value';
-    if (!formData.usage) newErrors.usage = 'Please select usage pattern';
-    
+    if (!formData.vehicleModel) newErrors.vehicleModel = 'Please enter vehicle value';
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = () => {
     if (validateForm()) {
-      onComplete(formData);
+      setShowConditions(true);
     }
   };
+
+  if (showConditions) {
+    return <InsuranceConditions onComplete={(data) => console.log(data)} isLoading={isLoading} />;
+  }
 
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.inputGroup}>
-        <ThemedText style={styles.label}>Vehicle Type</ThemedText>
+        <ThemedText style={styles.label}>Tipo de tractor</ThemedText>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={formData.vehicleType}
             onValueChange={(value) => handleChange('vehicleType', value)}
             style={styles.picker}
           >
-            {VEHICLE_TYPES.map(type => (
+            {VEHICLE_TYPES.map((type) => (
               <Picker.Item key={type.value} label={type.label} value={type.value} />
             ))}
           </Picker>
         </View>
         {errors.vehicleType && <ThemedText style={styles.errorText}>{errors.vehicleType}</ThemedText>}
       </ThemedView>
-      
+
       <ThemedView style={styles.inputGroup}>
-        <ThemedText style={styles.label}>Vehicle Age (years)</ThemedText>
+        <ThemedText style={styles.label}>Edad del tractor (años)</ThemedText>
         <TextInput
           style={styles.input}
           value={formData.vehicleAge}
@@ -94,42 +88,25 @@ export function InsuranceQuoteForm({ onComplete, isLoading }) {
         />
         {errors.vehicleAge && <ThemedText style={styles.errorText}>{errors.vehicleAge}</ThemedText>}
       </ThemedView>
-      
+
       <ThemedView style={styles.inputGroup}>
-        <ThemedText style={styles.label}>Vehicle Value (€)</ThemedText>
+        <ThemedText style={styles.label}>Marca</ThemedText>
         <TextInput
           style={styles.input}
-          value={formData.vehicleValue}
-          onChangeText={(text) => handleChange('vehicleValue', text)}
-          placeholder="e.g., 50000"
-          keyboardType="numeric"
+          value={formData.vehicleModel}
+          onChangeText={(text) => handleChange('vehicleModel', text)}
+          placeholder="e.g., John Deere"
         />
-        {errors.vehicleValue && <ThemedText style={styles.errorText}>{errors.vehicleValue}</ThemedText>}
+        {errors.vehicleModel && <ThemedText style={styles.errorText}>{errors.vehicleModel}</ThemedText>}
       </ThemedView>
-      
-      <ThemedView style={styles.inputGroup}>
-        <ThemedText style={styles.label}>Usage Pattern</ThemedText>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={formData.usage}
-            onValueChange={(value) => handleChange('usage', value)}
-            style={styles.picker}
-          >
-            {USAGE_TYPES.map(type => (
-              <Picker.Item key={type.value} label={type.label} value={type.value} />
-            ))}
-          </Picker>
-        </View>
-        {errors.usage && <ThemedText style={styles.errorText}>{errors.usage}</ThemedText>}
-      </ThemedView>
-      
-      <TouchableOpacity 
-        style={styles.submitButton} 
+
+      <TouchableOpacity
+        style={styles.submitButton}
         onPress={handleSubmit}
         disabled={isLoading}
       >
         <ThemedText style={styles.submitButtonText}>
-          {isLoading ? 'Analyzing Risk...' : 'Get My Quote'}
+          {isLoading ? 'Analizando datos...' : 'Continuar'}
         </ThemedText>
       </TouchableOpacity>
     </ThemedView>

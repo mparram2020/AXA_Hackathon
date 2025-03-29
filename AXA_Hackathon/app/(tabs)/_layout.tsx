@@ -34,10 +34,26 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="insurance"
+        name="acceso"
         options={{
-          title: 'Insurance',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Access',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="lock.fill" color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="contacto"
+        options={{
+          title: 'Contacto',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="phone.fill" color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="menu"
+        options={{
+          title: 'Menu',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="ellipsis" color={color} />,
         }}
       />
     </Tabs>
