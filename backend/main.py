@@ -1,4 +1,5 @@
 import json
+import json
 import os
 from fastapi import FastAPI, Query, HTTPException, File, UploadFile, Body
 from typing import Dict
@@ -160,3 +161,67 @@ async def process_image_for_insurance(file: UploadFile = File(...)) -> Dict:
         # Log the error for debugging
         print(f"Error in /process_image_for_insurance endpoint: {e}")
         raise HTTPException(status_code=500, detail="An error occurred while processing the image for insurance creation.")
+
+@app.post("/create_personalized_insurance")
+def create_personalized_insurance(user_input: str = Body(..., embed=True)) -> Dict:
+    """
+    Create a personalized insurance plan based on the data in seguro.md and user-provided input.
+    """
+    try:
+        # Load insurance data from seguro.md
+        with open("data/seguro.md", "r", encoding="utf-8") as file:
+            insurance_data = file.read()
+
+        # Prepare data for Gemini
+        gemini_input = {
+            "user_input": user_input,
+            "insurance_data": insurance_data
+        }
+
+        # Generate response using Gemini
+        response = generate_insurance_recommendations(gemini_input)
+
+        # Debug print for Gemini result
+        print("Gemini Personalized Insurance (Debug):", response)
+
+        # Return the response
+        return {
+            "user_input": user_input,
+            "personalized_insurance": response
+        }
+    except Exception as e:
+        # Handle errors and return a meaningful message
+        print(f"Error in /create_personalized_insurance endpoint: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while creating the personalized insurance.")
+
+@app.post("/analyze_vehicle_condition")
+def analyze_vehicle_condition(description: str = Body(..., embed=True)) -> Dict:
+    """
+    Analyze the vehicle's condition and determine coverage based on the data in cobertura.txt.
+    """
+    try:
+        # Load coverage data from cobertura.txt
+        with open("data/cobertura.txt", "r", encoding="utf-8") as file:
+            coverage_data = file.read()
+
+        # Prepare data for Gemini
+        gemini_input = {
+            "description": description,
+            "coverage_data": coverage_data
+        }
+
+        # Generate response using Gemini
+        response = generate_insurance_recommendations(gemini_input)
+
+        # Debug print for Gemini result
+        print("Gemini Vehicle Condition Analysis (Debug):", response)
+
+        # Return the response
+        return {
+            "description": description,
+            "coverage_analysis": response
+        }
+    except Exception as e:
+        # Handle errors and return a meaningful message
+        print(f"Error in /analyze_vehicle_condition endpoint: {e}")
+        raise HTTPException(status_code=500, detail="An error occurred while analyzing the vehicle condition.")

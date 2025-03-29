@@ -6,7 +6,7 @@ from google.genai import types
 
 def generate_insurance_recommendations(data: dict) -> dict:
     """
-    Generate detailed insurance recommendations or process accident descriptions using Gemini.
+    Generate detailed insurance recommendations or analyze vehicle condition using Gemini.
     """
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -17,28 +17,18 @@ def generate_insurance_recommendations(data: dict) -> dict:
     
     # Prepare input for Gemini
     input_text = f"""
-    Dado el siguiente caso de accidente y la información del seguro proporcionada, sigue este protocolo rígido para generar un JSON con los siguientes campos:
+    Dado el siguiente texto que describe la condición del vehículo y la información de cobertura proporcionada, sigue este protocolo rígido para generar un JSON con los siguientes campos:
 
-    1. `facts` (array de strings): Extrae exactamente los puntos factuales necesarios para que la compañía de seguros pueda procesar el caso. 
-       Incluye información como:
-       - Fecha y hora del accidente.
-       - Lugar exacto del accidente.
-       - Tipo de vehículo involucrado.
-       - Daños sufridos por el vehículo.
-       - Daños sufridos por terceros (personas o propiedades).
-       - Causa del accidente (si es conocida).
-       - Condiciones climáticas en el momento del accidente.
-       - Uso del vehículo en el momento del accidente (particular/profesional).
-       - Cualquier otra información relevante del caso.
+    1. `coverage_analysis` (array de objetos): Cada objeto debe contener:
+        - `item` (string): El nombre de la cobertura o exclusión.
+        - `is_covered` (boolean): Indica si está cubierto o no.
+        - `explanation` (string): Una breve explicación de por qué está cubierto o no.
 
-    2. `unanswered_questions` (array de strings): Incluye únicamente preguntas necesarias para completar los puntos factuales que no se pudieron determinar a partir de la descripción del accidente. 
-       Si todos los puntos factuales están completos, este campo debe estar vacío.
-
-    Caso de accidente:
-    {data['accident_description']}
+    Descripción del vehículo:
+    {data['description']}
     
-    Información del seguro:
-    {data['insurance_data']}
+    Información de cobertura:
+    {data['coverage_data']}
     
     Genera el JSON de salida.
     """
@@ -72,10 +62,10 @@ def generate_insurance_recommendations(data: dict) -> dict:
 
 if __name__ == "__main__":
     sample_data = {
-        "accident_description": "A tractor collided with a tree during heavy rain.",
-        "insurance_data": {
+        "description": "The car has minor scratches and a dent on the rear bumper.",
+        "coverage_data": {
             "policy_number": "12345",
-            "coverage": ["Collision", "Weather-related damages"],
+            "coverage": ["Collision", "Theft", "Weather-related damages"],
         },
     }
     recommendations = generate_insurance_recommendations(sample_data)
