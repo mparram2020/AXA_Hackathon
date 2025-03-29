@@ -42,9 +42,9 @@ else:
 
 def get_weather_data(lat: float, lon: float) -> dict:
     """
-    Fetch weather data for specific coordinates using AEMET API.
+    Fetch current weather observation data using AEMET API.
     """
-    endpoint = f'prediccion/especifica/municipio/latlon/{lat},{lon}'
+    endpoint = 'observacion/convencional/todas'
     response = requests.get(BASE_URL + endpoint, headers=headers)
 
     if response.status_code == 200:
@@ -53,16 +53,16 @@ def get_weather_data(lat: float, lon: float) -> dict:
         if data_response.status_code == 200:
             return data_response.json()
         else:
-            return {"error": f"Error fetching data: {data_response.status_code}"}
+            return {"error": f"Error fetching weather data: {data_response.status_code}"}
     else:
-        return {"error": f"Error with the API request: {response.status_code}"}
+        return {"error": f"Error with the weather API request: {response.status_code}"}
 
 
-def get_forecast_data(lat: float, lon: float) -> dict:
+def get_forecast_data(municipio: str) -> dict:
     """
-    Fetch forecast data for specific coordinates using AEMET API.
+    Fetch daily weather forecasts for a specific municipality using AEMET API.
     """
-    endpoint = f'prediccion/especifica/municipio/latlon/{lat},{lon}'
+    endpoint = f'prediccion/especifica/municipio/diaria/{municipio}'
     response = requests.get(BASE_URL + endpoint, headers=headers)
 
     if response.status_code == 200:
@@ -74,3 +74,21 @@ def get_forecast_data(lat: float, lon: float) -> dict:
             return {"error": f"Error fetching forecast data: {data_response.status_code}"}
     else:
         return {"error": f"Error with the forecast API request: {response.status_code}"}
+
+
+def get_climatological_data(fecha_ini: str, fecha_fin: str, idema: str) -> dict:
+    """
+    Fetch daily climatological data for a specific station using AEMET API.
+    """
+    endpoint = f'valores/climatologicos/diarios/datos/fechaini/{fecha_ini}/fechafin/{fecha_fin}/estacion/{idema}'
+    response = requests.get(BASE_URL + endpoint, headers=headers)
+
+    if response.status_code == 200:
+        data_url = response.json().get('datos')
+        data_response = requests.get(data_url)
+        if data_response.status_code == 200:
+            return data_response.json()
+        else:
+            return {"error": f"Error fetching climatological data: {data_response.status_code}"}
+    else:
+        return {"error": f"Error with the climatological API request: {response.status_code}"}
