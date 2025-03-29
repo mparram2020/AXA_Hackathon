@@ -7,68 +7,120 @@ import { router } from 'expo-router';
 import { Colors, Fonts } from '@/constants/theme';
 
 export default function Step2() {
-  const { data, setData } = useInsurance();
+  const { data } = useInsurance();
+
+  // Log the data from the context
+  console.log('Context data:', data);
+
+  // Ensure vehicleDetails exists
+  const vehicleDetails = data?.vehicleDetails || {};
 
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.title}>Confirm Vehicle Details</ThemedText>
-      <Image source={{ uri: data.photo }} style={styles.photo} />
-      <ThemedText style={styles.details}>
-        Model: {data.vehicleDetails?.model}
+      <ThemedText style={styles.title}>Confirma los detalles del vehículo</ThemedText>
+      <ThemedText style={styles.subtitle}>
+        Verifica que los detalles sean correctos o toma otra foto si es necesario.
       </ThemedText>
-      <ThemedText style={styles.details}>
-        Year: {data.vehicleDetails?.year}
-      </ThemedText>
-      <ThemedText style={styles.details}>
-        Manufacturer: {data.vehicleDetails?.manufacturer}
-      </ThemedText>
+
+      <View style={styles.card}>
+        <Image source={{ uri: data.photo }} style={styles.photo} />
+        <View style={styles.detailsContainer}>
+          <ThemedText style={styles.detailsText}>
+            <ThemedText style={styles.label}>Modelo: </ThemedText>
+            {vehicleDetails.model || 'Desconocido'}
+          </ThemedText>
+          <ThemedText style={styles.detailsText}>
+            <ThemedText style={styles.label}>Condición: </ThemedText>
+            {vehicleDetails.condition || 'Desconocido'}
+          </ThemedText>
+          <ThemedText style={styles.detailsText}>
+            <ThemedText style={styles.label}>Color: </ThemedText>
+            {vehicleDetails.color || 'Desconocido'}
+          </ThemedText>
+          <ThemedText style={styles.detailsText}>
+            <ThemedText style={styles.label}>Año: </ThemedText>
+            {vehicleDetails.year || 'Desconocido'}
+          </ThemedText>
+          <ThemedText style={styles.detailsText}>
+            <ThemedText style={styles.label}>Descripción adicional: </ThemedText>
+            {vehicleDetails.additionalDescription || 'No disponible'}
+          </ThemedText>
+        </View>
+      </View>
+
       <Button
-        title="Confirm"
-        onPress={() => router.push('/insurance/step3')} // Correct usage
+        title="Confirmar"
+        onPress={() => router.push('/insurance/step3')}
         type="primary"
+        style={styles.button}
       />
       <Button
-        title="Retake Photo"
-        onPress={() => router.push('/insurance/step1')} // Correct usage
+        title="Tomar otra foto"
+        onPress={() => router.push('/insurance/step1')}
         type="secondary"
+        style={styles.button}
       />
     </View>
   );
 }
+
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 16,
-      backgroundColor: Colors.background,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    title: {
-      ...Fonts.title,
-      marginBottom: 16,
-      textAlign: 'center',
-    },
-    photo: {
-      width: 200,
-      height: 200,
-      borderRadius: 12,
-      marginBottom: 16,
-      borderWidth: 2,
-      borderColor: Colors.primary,
-    },
-    detailsCard: {
-      width: '100%',
-      padding: 16,
-      backgroundColor: Colors.white,
-      borderRadius: 12,
-      shadowColor: '#000',
-      shadowOpacity: 0.1,
-      shadowRadius: 8,
-      elevation: 4,
-      marginBottom: 16,
-    },
-    detailsText: {
-      ...Fonts.body,
-      marginBottom: 8,
-    },
-  });
+  container: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: Colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  title: {
+    ...Fonts.title,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    ...Fonts.body,
+    textAlign: 'center',
+    marginBottom: 24,
+    color: Colors.textSecondary,
+  },
+  card: {
+    width: '100%',
+    backgroundColor: Colors.white,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: Colors.border,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    marginBottom: 24,
+  },
+  photo: {
+    width: 300,
+    height: 300,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: Colors.primary,
+    marginBottom: 16,
+  },
+  detailsContainer: {
+    width: '100%',
+    alignItems: 'flex-start',
+  },
+  detailsText: {
+    ...Fonts.body,
+    marginBottom: 8,
+    color: Colors.textPrimary,
+  },
+  label: {
+    fontWeight: 'bold',
+    color: Colors.textSecondary,
+  },
+  button: {
+    width: '100%',
+    marginTop: 16,
+  },
+});

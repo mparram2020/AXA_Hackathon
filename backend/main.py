@@ -3,7 +3,6 @@ import os
 from fastapi import FastAPI, Query, HTTPException, File, UploadFile, Body
 from typing import Dict
 from pydantic import BaseModel
-from src.aemet import get_weather_data, get_forecast_data, get_climatological_data
 from gemini import generate_insurance_recommendations
 from src.image_proc import process_image_with_gemini, process_image_for_insurance_creation
 
