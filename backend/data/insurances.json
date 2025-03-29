@@ -1,0 +1,14 @@
+[
+    {
+        "modelo_tractor": "John Deere 5075E",
+        "condicion": "Buen estado",
+        "color": "Verde",
+        "año": 2020,
+        "descripcion_adicional": "Tractor usado para actividades agrícolas.",
+        "coordinates": [
+            40.4168,
+            -3.7038
+        ],
+        "garaje": true
+    }
+]
