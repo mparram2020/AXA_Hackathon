@@ -25,6 +25,20 @@ export function ClaimStep({
   canProgress,
   isLastStep,
 }: ClaimStepProps) {
+  // Add these handlers to prevent event bubbling
+  const handleNext = (e: any) => {
+    // Prevent any default behavior that might affect scrolling
+    console.log('Next button clicked');
+    if (e && e.preventDefault) e.preventDefault();
+    onNext();
+  };
+
+  const handlePrevious = (e: any) => {
+    // Prevent any default behavior that might affect scrolling
+    if (e && e.preventDefault) e.preventDefault();
+    onPrevious();
+  };
+
   return (
     <ThemedView style={styles.container}>
       <ThemedView style={styles.header}>
@@ -43,13 +57,13 @@ export function ClaimStep({
       <ThemedView style={styles.footer}>
         <Button 
           title="Back" 
-          onPress={onPrevious} 
+          onPress={handlePrevious} 
           style={styles.backButton} 
           type="secondary"
         />
         <Button
           title={isLastStep ? "Submit Claim" : "Next"}
-          onPress={onNext}
+          onPress={handleNext}
           disabled={!canProgress}
           style={styles.nextButton}
           type="primary"
